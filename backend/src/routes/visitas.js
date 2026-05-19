@@ -4,7 +4,7 @@ const pool = require("../db");
 
 // Criar visita
 router.post("/", async (req, res) => {
-  let {
+  const {
     data_agendamento,
     tecnico_id,
     analista_id,
@@ -16,7 +16,6 @@ router.post("/", async (req, res) => {
     status
   } = req.body;
 
-  // Validação simples
   if (!data_agendamento || !tecnico_id || !analista_id || !empresa || !endereco) {
     return res.status(400).json({
       error: "Verifique e complete todas as informações obrigatórias antes de salvar a visita."
@@ -24,61 +23,94 @@ router.post("/", async (req, res) => {
   }
 
   try {
-    await pool.query(
+    // insere e retorna o id
+    const result = await pool.query(
       `INSERT INTO visitas 
        (data_agendamento, tecnico_id, analista_id, zona, empresa, endereco, latitude, longitude, status) 
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id`,
       [data_agendamento, tecnico_id, analista_id, zona, empresa, endereco, latitude, longitude, status]
     );
-    res.status(201).json({ message: "Visita criada com sucesso!" });
+
+    const id = result.rows[0].id;
+
+    // busca a visita criada já com join para trazer nomes
+    const visitaCriada = await pool.query(`
+      SELECT v.*, t.nome AS tecnico, a.nome AS analista
+      FROM visitas v
+      JOIN tecnicos t ON v.tecnico_id = t.id
+      JOIN analistas a ON v.analista_id = a.id
+      WHERE v.id = $1
+    `, [id]);
+
+    res.status(201).json(visitaCriada.rows[0]);
   } catch (err) {
     console.error("Erro ao criar visita:", err);
     res.status(500).json({ error: "Erro interno ao criar visita. Tente novamente mais tarde." });
   }
 });
 
-async function salvarVisita() {
-  try {
-    const resp = await criarVisita(novaVisita);
-    if (resp.message) {
-      alert(resp.message); // mostra mensagem de sucesso
-    } else if (resp.error) {
-      alert(resp.error); // mostra mensagem de erro amigável
-    }
-  } catch (err) {
-    alert("Erro inesperado ao salvar a visita.");
-  }
-}
-
-
-
-// listar visitas
+// Listar visitas
 router.get("/", async (req, res) => {
-  const result = await pool.query(`
-    SELECT v.*, t.nome AS tecnico, a.nome AS analista
-    FROM visitas v
-    JOIN tecnicos t ON v.tecnico_id = t.id
-    JOIN analistas a ON v.analista_id = a.id
-    ORDER BY v.data_agendamento ASC
-  `);
-  res.json(result.rows);
+  try {
+    const result = await pool.query(`
+      SELECT v.*, t.nome AS tecnico, a.nome AS analista
+      FROM visitas v
+      JOIN tecnicos t ON v.tecnico_id = t.id
+      JOIN analistas a ON v.analista_id = a.id
+      ORDER BY v.data_agendamento ASC
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Erro ao listar visitas:", err);
+    res.status(500).json({ error: "Erro interno ao listar visitas." });
+  }
 });
 
-// atualizar visita
+// Atualizar visita
 router.put("/:id", async (req, res) => {
-  const { data_agendamento, zona, empresa, endereco, status } = req.body;
-  const result = await pool.query(
-    `UPDATE visitas SET data_agendamento=$1, zona=$2, empresa=$3, endereco=$4, status=$5
-     WHERE id=$6 RETURNING *`,
-    [data_agendamento, zona, empresa, endereco, status, req.params.id]
-  );
-  res.json(result.rows[0]);
+  const {
+    data_agendamento,
+    tecnico_id,
+    analista_id,
+    zona,
+    empresa,
+    endereco,
+    status
+  } = req.body;
+
+  try {
+    await pool.query(
+      `UPDATE visitas 
+       SET data_agendamento=$1, tecnico_id=$2, analista_id=$3, zona=$4, empresa=$5, endereco=$6, status=$7
+       WHERE id=$8`,
+      [data_agendamento, tecnico_id, analista_id, zona, empresa, endereco, status, req.params.id]
+    );
+
+    // busca novamente com join para trazer nomes atualizados
+    const visitaAtualizada = await pool.query(`
+      SELECT v.*, t.nome AS tecnico, a.nome AS analista
+      FROM visitas v
+      JOIN tecnicos t ON v.tecnico_id = t.id
+      JOIN analistas a ON v.analista_id = a.id
+      WHERE v.id = $1
+    `, [req.params.id]);
+
+    res.json(visitaAtualizada.rows[0]);
+  } catch (err) {
+    console.error("Erro ao atualizar visita:", err);
+    res.status(500).json({ error: "Erro interno ao atualizar visita." });
+  }
 });
 
-// excluir visita
+// Excluir visita
 router.delete("/:id", async (req, res) => {
-  await pool.query("DELETE FROM visitas WHERE id=$1", [req.params.id]);
-  res.json({ success: true });
+  try {
+    await pool.query("DELETE FROM visitas WHERE id=$1", [req.params.id]);
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Erro ao excluir visita:", err);
+    res.status(500).json({ error: "Erro interno ao excluir visita." });
+  }
 });
 
 module.exports = router;

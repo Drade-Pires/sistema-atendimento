@@ -1,54 +1,50 @@
-/* Chamados.css */
 .chamados-container {
-  max-width: 600px;
-  margin: 40px auto;
+  max-width: 1000px;
+  margin: 0 auto;
   padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #f9f9f9;
 }
 
 .chamados-title {
   text-align: center;
   margin-bottom: 20px;
-  color: #333;
+  color: var(--color-primary);
 }
 
 .chamados-form {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 20px;
 }
 
-.chamados-form label {
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* duas colunas */
+  gap: 20px;
+}
+
+.form-grid label {
+  display: flex;
+  flex-direction: column;
   font-weight: bold;
-  color: #555;
+  color: var(--color-text);
 }
 
-.chamados-form input,
-.chamados-form select,
-.chamados-form textarea {
-  width: 100%;
-  padding: 8px;
-  margin-top: 5px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.chamados-form textarea {
-  min-height: 80px;
+.endereco-field {
+  grid-column: span 2; /* endereço ocupa largura total */
 }
 
 .chamados-button {
-  padding: 10px;
-  background-color: #007bff;
+  align-self: center;
+  padding: 12px 24px;
+  background-color: var(--color-primary);
   color: #fff;
   border: none;
-  border-radius: 5px;
-  cursor: pointer;
+  border-radius: 6px;
   font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .chamados-button:hover {
-  background-color: #0056b3;
+  background-color: #b71c1c;
 }

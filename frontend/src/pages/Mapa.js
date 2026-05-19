@@ -1,77 +1,150 @@
 import React, { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
-import { getVisitas, getGeocode } from "../services/api";
+import { getVisitas, getGeocodeEndereco } from "../services/api";
+import { formatarEndereco } from "../utils/formatarEndereco";
 import "leaflet/dist/leaflet.css";
 
-const coresTecnicos = {
-  1: "red",
-  2: "blue",
-  3: "green",
-  4: "orange"
-};
+// ícones coloridos
+const redIcon = new L.Icon({
+  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
 
-function getIcon(cor) {
-  return new L.Icon({
-    iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${cor}.png`,
-    shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
-  });
-}
+const blueIcon = new L.Icon({
+  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png",
+  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+const greenIcon = new L.Icon({
+  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png",
+  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+const orangeIcon = new L.Icon({
+  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-orange.png",
+  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
 
 function Mapa() {
   const [visitas, setVisitas] = useState([]);
+  const [dataFiltro, setDataFiltro] = useState("");
+  const [enderecoBusca, setEnderecoBusca] = useState("");
+  const [tecnicoProximo, setTecnicoProximo] = useState(null);
+
+  const iconesTecnicos = {
+    "Carlos Pereira": redIcon,
+    "Fernanda Lima": blueIcon,
+    "Ana Costa": greenIcon,
+    "Beatriz Gomes": orangeIcon
+  };
 
   useEffect(() => {
     async function carregarVisitas() {
       const dados = await getVisitas();
-      console.log("Visitas recebidas:", dados); // debug
-
-      const visitasComCoords = await Promise.all(
-        dados.map(async (v) => {
-          try {
-            const resultados = await getGeocode(v.endereco);
-            if (resultados.length > 0) {
-              const { lat, lon } = resultados[0];
-              return { ...v, lat: parseFloat(lat), lon: parseFloat(lon) };
-            }
-          } catch (err) {
-            console.error("Erro geocode:", err);
-          }
-          return v;
-        })
-      );
-      setVisitas(visitasComCoords);
+      setVisitas(dados);
     }
     carregarVisitas();
   }, []);
 
+  const visitasFiltradas = dataFiltro
+    ? visitas.filter((v) => {
+        const dataVisita = new Date(v.data_agendamento)
+          .toISOString()
+          .split("T")[0];
+        return dataVisita === dataFiltro;
+      })
+    : visitas;
+
+  // função para calcular distância (Haversine)
+  function calcularDistancia(lat1, lon1, lat2, lon2) {
+    const R = 6371; // km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a =
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) *
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  }
+
+  async function buscarTecnicoMaisProximo() {
+    if (!enderecoBusca) return;
+    try {
+      const resultados = await getGeocodeEndereco(enderecoBusca);
+      const alvo = resultados[0];
+      if (!alvo) return;
+
+      const latAlvo = parseFloat(alvo.lat);
+      const lonAlvo = parseFloat(alvo.lon);
+
+      let tecnicoMaisProximo = null;
+      let menorDistancia = Infinity;
+
+      visitas.forEach(v => {
+        if (v.latitude && v.longitude) {
+          const dist = calcularDistancia(latAlvo, lonAlvo, v.latitude, v.longitude);
+          if (dist < menorDistancia) {
+            menorDistancia = dist;
+            tecnicoMaisProximo = v.tecnico;
+          }
+        }
+      });
+
+      setTecnicoProximo({ nome: tecnicoMaisProximo, distancia: menorDistancia.toFixed(2) });
+    } catch (err) {
+      console.error("Erro ao buscar técnico mais próximo:", err);
+    }
+  }
+
   return (
     <div style={{ display: "flex", height: "70vh", width: "100%" }}>
-      {/* Mapa */}
       <div style={{ flex: 3 }}>
-        <MapContainer center={[-25.4284, -49.2733]} zoom={12} style={{ height: "100%", width: "100%" }}>
+        <MapContainer
+          center={[-23.5505, -46.6333]} // centro inicial (São Paulo)
+          zoom={10}
+          style={{ height: "100%", width: "100%" }}
+        >
+
           <TileLayer
             attribution='&copy; OpenStreetMap'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
 
-          {visitas.map((v, i) =>
-            v.lat && v.lon ? (
+          {visitasFiltradas.map((v, i) =>
+            v.latitude && v.longitude ? (
               <Marker
                 key={i}
-                position={[v.lat, v.lon]}
-                icon={getIcon(coresTecnicos[v.tecnico_id] || "red")}
+                position={[v.latitude, v.longitude]}
+                icon={iconesTecnicos[v.tecnico] || blueIcon}
               >
                 <Popup>
-                  <strong>{v.empresa}</strong><br />
-                  Técnico: {v.tecnico}<br />
-                  Analista: {v.analista}<br />
-                  Endereço: {v.endereco}<br />
-                  Data: {v.data_agendamento}
+                  <strong>{v.empresa}</strong>
+                  <br />
+                  Técnico: {v.tecnico}
+                  <br />
+                  Analista: {v.analista}
+                  <br />
+                  Endereço: {formatarEndereco(v)}
+                  <br />
+                  Data: {new Date(v.data_agendamento).toLocaleDateString("pt-BR")}
                 </Popup>
               </Marker>
             ) : null
@@ -79,25 +152,58 @@ function Mapa() {
         </MapContainer>
       </div>
 
-      {/* Legenda */}
-      <div style={{
-        flex: 1,
-        background: "#f9f9f9",
-        padding: "15px",
-        borderLeft: "2px solid #ddd",
-        overflowY: "auto"
-      }}>
+      <div style={{ flex: 1, padding: "15px" }}>
         <h3>Legenda de Técnicos</h3>
-        {Object.entries(coresTecnicos).map(([id, cor]) => (
-          <div key={id} style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
-            <img
-              src={`https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${cor}.png`}
-              alt={`Técnico ${id}`}
-              style={{ width: "20px", marginRight: "8px" }}
-            />
-            <span>Técnico {id}</span>
-          </div>
-        ))}
+        <ul style={{ listStyle: "none", padding: 0 }}>
+          {Object.entries(iconesTecnicos).map(([nome, icon]) => (
+            <li
+              key={nome}
+              style={{
+                marginBottom: "8px",
+                display: "flex",
+                alignItems: "center"
+              }}
+            >
+              <span
+                style={{
+                  width: "16px",
+                  height: "16px",
+                  backgroundColor:
+                    icon.options.iconUrl.includes("red") ? "red" :
+                    icon.options.iconUrl.includes("blue") ? "blue" :
+                    icon.options.iconUrl.includes("green") ? "green" :
+                    icon.options.iconUrl.includes("orange") ? "orange" : "gray",
+                  display: "inline-block",
+                  marginRight: "8px"
+                }}
+              ></span>
+              {nome}
+            </li>
+          ))}
+        </ul>
+
+        <h3>Filtrar por data</h3>
+        <input
+          type="date"
+          value={dataFiltro}
+          onChange={(e) => setDataFiltro(e.target.value)}
+        />
+
+        <h3 style={{ marginTop: "20px" }}>Buscar técnico mais próximo</h3>
+        <input
+          type="text"
+          placeholder="Digite o endereço"
+          value={enderecoBusca}
+          onChange={e => setEnderecoBusca(e.target.value)}
+        />
+        <button onClick={buscarTecnicoMaisProximo}>Buscar</button>
+
+        {tecnicoProximo && (
+          <p style={{ marginTop: "10px" }}>
+            Técnico mais próximo: <strong>{tecnicoProximo.nome}</strong><br/>
+            Distância: {tecnicoProximo.distancia} km
+          </p>
+        )}
       </div>
     </div>
   );

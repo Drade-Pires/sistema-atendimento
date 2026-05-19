@@ -101,3 +101,8 @@ export async function getGeocode(endereco) {
   return response.json();
 }
 
+export async function getGeocodeEndereco(enderecoCompleto) {
+  const resp = await fetch(`http://localhost:3000/geocode?q=${encodeURIComponent(enderecoCompleto)}`);
+  return await resp.json();
+}
+
