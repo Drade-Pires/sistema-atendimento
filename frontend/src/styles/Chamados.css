@@ -1,0 +1,54 @@
+/* Chamados.css */
+.chamados-container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.chamados-title {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.chamados-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.chamados-form label {
+  font-weight: bold;
+  color: #555;
+}
+
+.chamados-form input,
+.chamados-form select,
+.chamados-form textarea {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.chamados-form textarea {
+  min-height: 80px;
+}
+
+.chamados-button {
+  padding: 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.chamados-button:hover {
+  background-color: #0056b3;
+}
