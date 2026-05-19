@@ -3,19 +3,27 @@ const router = express.Router();
 const pool = require('../db');
 
 // Criar chamado
-router.post('/', async (req, res) => {
-  const { cliente_id, tecnico_id, descricao, status, endereco, data_atendimento } = req.body;
+router.post("/", async (req, res) => {
+  const {
+    empresa,
+    endereco,
+    latitude,
+    longitude,
+    status
+  } = req.body;
+
   try {
-    const result = await pool.query(
-      'INSERT INTO chamados (cliente_id, tecnico_id, descricao, status, endereco, data_atendimento) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-      [cliente_id, tecnico_id, descricao, status || 'aberto', endereco, data_atendimento]
+    await db.query(
+      "INSERT INTO chamados (empresa, endereco, latitude, longitude, status) VALUES (?, ?, ?, ?, ?)",
+      [empresa, endereco, latitude, longitude, status]
     );
-    res.json(result.rows[0]);
+    res.status(201).json({ message: "Chamado criado com sucesso" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Erro ao criar chamado' });
+    res.status(500).json({ error: "Erro ao criar chamado" });
   }
 });
+
 
 // Listar chamados
 router.get('/', async (req, res) => {
