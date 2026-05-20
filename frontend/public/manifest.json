@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Agendamento",
+  "name": "Agendamento de Visitas Técnicas",
   "icons": [
     {
       "src": "favicon.ico",
