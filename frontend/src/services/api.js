@@ -1,4 +1,10 @@
-const API_URL = "http://localhost:3000";
+const apiUrl = process.env.REACT_APP_API_URL;
+
+export async function getVisitas() {
+  const res = await fetch(`${apiUrl}/visitas`);
+  return res.json();
+}
+
 
 export async function getChamados() {
   const response = await fetch(`${API_URL}/chamados`);
