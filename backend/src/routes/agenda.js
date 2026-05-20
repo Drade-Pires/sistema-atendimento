@@ -1,5 +1,9 @@
+const express = require("express");
+const router = express.Router();
+const pool = require("../db");
+
 // Lista todos os técnicos
-router.get('/', async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM tecnicos ORDER BY id ASC");
     res.json(result.rows);
@@ -9,7 +13,7 @@ router.get('/', async (req, res) => {
 });
 
 // Agenda de um técnico específico
-router.get('/:tecnico_id', async (req, res) => {
+router.get("/:tecnico_id", async (req, res) => {
   const { tecnico_id } = req.params;
   try {
     const result = await pool.query(
@@ -25,3 +29,5 @@ router.get('/:tecnico_id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+module.exports = router;
