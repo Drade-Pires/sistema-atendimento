@@ -4,31 +4,33 @@ const pool = require('../db');
 
 // Criar chamado
 router.post("/", async (req, res) => {
-  const {
-    empresa,
-    endereco,
-    latitude,
-    longitude,
-    status
-  } = req.body;
+  const { empresa, endereco, latitude, longitude, status } = req.body;
+
+  if (!empresa || !endereco) {
+    return res.status(400).json({ error: "Campos obrigatórios: empresa e endereco." });
+  }
 
   try {
-    await db.query(
-      "INSERT INTO chamados (empresa, endereco, latitude, longitude, status) VALUES (?, ?, ?, ?, ?)",
+    const result = await pool.query(
+      "INSERT INTO chamados (empresa, endereco, latitude, longitude, status) VALUES ($1, $2, $3, $4, $5) RETURNING *",
       [empresa, endereco, latitude, longitude, status]
     );
-    res.status(201).json({ message: "Chamado criado com sucesso" });
+    res.status(201).json(result.rows[0]);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Erro ao criar chamado" });
+    console.error("Erro ao criar chamado:", err);
+    res.status(500).json({ error: "Erro interno ao criar chamado." });
   }
 });
 
-
 // Listar chamados
-router.get('/', async (req, res) => {
-  const result = await pool.query('SELECT * FROM chamados');
-  res.json(result.rows);
+router.get("/", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM chamados ORDER BY id ASC");
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Erro ao listar chamados:", err);
+    res.status(500).json({ error: "Erro interno ao listar chamados." });
+  }
 });
 
 module.exports = router;
