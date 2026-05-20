@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getTecnicos, getAnalistas, criarVisita, getGeocodeEndereco } from "../services/api";
+import { getTecnicosPorRegiao, getAnalistas, criarVisita, getGeocodeEndereco } from "../services/api";
 import EnderecoInput from "../components/EnderecoInput";
 import "../styles/Chamados.css";
 
@@ -9,7 +9,7 @@ function Chamados() {
   const [dataAgendamento, setDataAgendamento] = useState("");
   const [tecnicoId, setTecnicoId] = useState("");
   const [analistaId, setAnalistaId] = useState("");
-  const [regiao, setRegiao] = useState(""); // NOVO campo obrigatório
+  const [regiao, setRegiao] = useState(""); // campo obrigatório
   const [zona, setZona] = useState("");
   const [empresa, setEmpresa] = useState("");
   const [endereco, setEndereco] = useState({
@@ -24,9 +24,18 @@ function Chamados() {
   });
 
   useEffect(() => {
-    getTecnicos().then(setTecnicos);
     getAnalistas().then(setAnalistas);
   }, []);
+
+  // sempre que a região mudar, carrega os técnicos daquela região
+  useEffect(() => {
+    if (regiao) {
+      getTecnicosPorRegiao(regiao).then(setTecnicos);
+      setTecnicoId(""); // limpa seleção anterior
+    } else {
+      setTecnicos([]);
+    }
+  }, [regiao]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -36,7 +45,6 @@ function Chamados() {
       return;
     }
 
-    // monta endereço completo com CEP
     const enderecoCompleto = `${endereco.endereco}, ${endereco.numero} - ${endereco.cidade}/${endereco.estado}, ${endereco.cep}`;
 
     let lat = endereco.lat;
@@ -45,18 +53,14 @@ function Chamados() {
     if (!lat || !lon) {
       try {
         const resultados = await getGeocodeEndereco(enderecoCompleto);
-
         const resultadoValido = resultados.find(
           r =>
             r.display_name &&
             r.display_name.toLowerCase().includes(endereco.cidade.toLowerCase())
         );
-
         if (resultadoValido) {
           lat = parseFloat(resultadoValido.lat);
           lon = parseFloat(resultadoValido.lon);
-        } else {
-          console.warn("Nenhum resultado válido encontrado para:", enderecoCompleto);
         }
       } catch (err) {
         console.error("Erro ao buscar coordenadas:", err);
@@ -67,7 +71,7 @@ function Chamados() {
       data_agendamento: dataAgendamento,
       tecnico_id: tecnicoId,
       analista_id: analistaId,
-      regiao, // NOVO campo enviado para backend
+      regiao,
       zona,
       empresa,
       cep: endereco.cep,
@@ -81,7 +85,7 @@ function Chamados() {
     setDataAgendamento("");
     setTecnicoId("");
     setAnalistaId("");
-    setRegiao(""); // limpa região
+    setRegiao("");
     setZona("");
     setEmpresa("");
     setEndereco({
@@ -118,7 +122,7 @@ function Chamados() {
 
           <label>
             Técnico:
-            <select value={tecnicoId} onChange={e => setTecnicoId(e.target.value)}>
+            <select value={tecnicoId} onChange={e => setTecnicoId(e.target.value)} required>
               <option value="">Selecione o técnico</option>
               {tecnicos.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
             </select>

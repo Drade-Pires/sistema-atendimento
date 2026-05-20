@@ -33,6 +33,12 @@ export async function getTecnicos() {
   return response.json();
 }
 
+// NOVO: pega técnicos filtrados por região
+export async function getTecnicosPorRegiao(regiao) {
+  const response = await fetch(`${API_URL}/tecnicos/regiao/${regiao}`);
+  return response.json();
+}
+
 export async function criarTecnico(tecnico) {
   const response = await fetch(`${API_URL}/tecnicos`, {
     method: "POST",
@@ -102,7 +108,6 @@ export async function getGeocode(endereco) {
 }
 
 export async function getGeocodeEndereco(enderecoCompleto) {
-  const resp = await fetch(`http://localhost:3000/geocode?q=${encodeURIComponent(enderecoCompleto)}`);
-  return await resp.json();
+  const response = await fetch(`${API_URL}/geocode?q=${encodeURIComponent(enderecoCompleto)}`);
+  return response.json();
 }
-
