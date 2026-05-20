@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import { getVisitas, getGeocodeEndereco } from "../services/api";
 import { formatarEndereco } from "../utils/formatarEndereco";
@@ -42,7 +42,15 @@ const orangeIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
+// componente auxiliar para mudar a visão do mapa
+function ChangeView({ center }) {
+  const map = useMap();
+  map.setView(center, 10); // zoom 10
+  return null;
+}
+
 function Mapa() {
+  const [center, setCenter] = useState([-23.5505, -46.6333]); // São Paulo inicial
   const [visitas, setVisitas] = useState([]);
   const [dataFiltro, setDataFiltro] = useState("");
   const [enderecoBusca, setEnderecoBusca] = useState("");
@@ -117,16 +125,12 @@ function Mapa() {
   return (
     <div style={{ display: "flex", height: "70vh", width: "100%" }}>
       <div style={{ flex: 3 }}>
-        <MapContainer
-          center={[-23.5505, -46.6333]} // centro inicial (São Paulo)
-          zoom={10}
-          style={{ height: "100%", width: "100%" }}
-        >
-
+        <MapContainer center={center} zoom={10} style={{ height: "100%", width: "100%" }}>
           <TileLayer
             attribution='&copy; OpenStreetMap'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
+          <ChangeView center={center} />
 
           {visitasFiltradas.map((v, i) =>
             v.latitude && v.longitude ? (
@@ -136,14 +140,10 @@ function Mapa() {
                 icon={iconesTecnicos[v.tecnico] || blueIcon}
               >
                 <Popup>
-                  <strong>{v.empresa}</strong>
-                  <br />
-                  Técnico: {v.tecnico}
-                  <br />
-                  Analista: {v.analista}
-                  <br />
-                  Endereço: {formatarEndereco(v)}
-                  <br />
+                  <strong>{v.empresa}</strong><br />
+                  Técnico: {v.tecnico}<br />
+                  Analista: {v.analista}<br />
+                  Endereço: {formatarEndereco(v)}<br />
                   Data: {new Date(v.data_agendamento).toLocaleDateString("pt-BR")}
                 </Popup>
               </Marker>
@@ -181,6 +181,11 @@ function Mapa() {
             </li>
           ))}
         </ul>
+
+        <h3>Selecionar cidade</h3>
+        <button onClick={() => setCenter([-23.5505, -46.6333])}>São Paulo</button>
+        <button onClick={() => setCenter([-25.4284, -49.2733])}>Curitiba</button>
+        <button onClick={() => setCenter([-22.9068, -43.1729])}>Rio de Janeiro</button>
 
         <h3>Filtrar por data</h3>
         <input
