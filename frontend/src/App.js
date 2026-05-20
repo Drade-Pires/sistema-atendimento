@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, NavLink } from "react-router-do
 import Chamados from "./pages/Chamados";
 import Agenda from "./pages/Agenda";
 import Mapa from "./pages/Mapa";
+import TecnicosPorRegiao from "./pages/TecnicosPorRegiao"; // novo componente
 import "leaflet/dist/leaflet.css";
 import "./App.css";
 
@@ -22,6 +23,9 @@ function App() {
             <NavLink to="/mapa" className="menu-item">
               Mapa
             </NavLink>
+            <NavLink to="/tecnicos" className="menu-item">
+              Técnicos
+            </NavLink>
           </nav>
         </aside>
 
@@ -31,6 +35,7 @@ function App() {
             <Route path="/chamados" element={<Chamados />} />
             <Route path="/agenda" element={<Agenda tecnicoId={1} />} />
             <Route path="/mapa" element={<Mapa />} />
+            <Route path="/tecnicos" element={<TecnicosPorRegiao />} /> {/* nova rota */}
           </Routes>
         </main>
       </div>
