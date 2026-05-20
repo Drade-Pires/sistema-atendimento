@@ -1,26 +1,14 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const pool = require("./db"); // importa a conexão com Postgres
-
-const pool = require("./db");
-
-app.get("/pingdb", async (req, res) => {
-  try {
-    const result = await pool.query("SELECT NOW()");
-    res.json({ ok: true, time: result.rows[0] });
-  } catch (err) {
-    console.error("Erro ao conectar ao banco:", err.message);
-    res.status(500).json({ error: "Falha na conexão com o banco" });
-  }
-});
+const pool = require("./db"); // conexão com Postgres
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-// Rotas existentes
+// Rotas
 const chamadosRoutes = require("./routes/chamados");
 app.use("/chamados", chamadosRoutes);
 
@@ -42,11 +30,10 @@ app.use("/analistas", analistasRoutes);
 const visitasRoutes = require("./routes/visitas");
 app.use("/visitas", visitasRoutes);
 
-// Nova rota para geocode
 const geocodeRoutes = require("./routes/geocode");
 app.use("/geocode", geocodeRoutes);
 
-// Rota de teste para validar conexão com banco
+// Rota de teste para conexão com banco
 app.get("/pingdb", async (req, res) => {
   try {
     const result = await pool.query("SELECT NOW()");
