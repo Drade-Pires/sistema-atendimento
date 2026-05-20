@@ -3,6 +3,18 @@ const express = require("express");
 const cors = require("cors");
 const pool = require("./db"); // importa a conexão com Postgres
 
+const pool = require("./db");
+
+app.get("/pingdb", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT NOW()");
+    res.json({ ok: true, time: result.rows[0] });
+  } catch (err) {
+    console.error("Erro ao conectar ao banco:", err.message);
+    res.status(500).json({ error: "Falha na conexão com o banco" });
+  }
+});
+
 const app = express();
 
 app.use(cors());
