@@ -1,8 +1,16 @@
 const API_URL = process.env.REACT_APP_API_URL;
 
+async function handleResponse(response, action) {
+  if (!response.ok) {
+    const erro = await response.text();
+    throw new Error(`Erro ao ${action}: ${erro}`);
+  }
+  return response.json();
+}
+
 export async function getChamados() {
   const response = await fetch(`${API_URL}/chamados`);
-  return response.json();
+  return handleResponse(response, "buscar chamados");
 }
 
 export async function criarChamado(chamado) {
@@ -11,12 +19,12 @@ export async function criarChamado(chamado) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(chamado),
   });
-  return response.json();
+  return handleResponse(response, "criar chamado");
 }
 
 export async function getClientes() {
   const response = await fetch(`${API_URL}/clientes`);
-  return response.json();
+  return handleResponse(response, "buscar clientes");
 }
 
 export async function criarCliente(cliente) {
@@ -25,18 +33,18 @@ export async function criarCliente(cliente) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(cliente)
   });
-  return response.json();
+  return handleResponse(response, "criar cliente");
 }
 
 export async function getTecnicos() {
   const response = await fetch(`${API_URL}/tecnicos`);
-  return response.json();
+  return handleResponse(response, "buscar técnicos");
 }
 
 // NOVO: pega técnicos filtrados por região
 export async function getTecnicosPorRegiao(regiao) {
   const response = await fetch(`${API_URL}/tecnicos/regiao/${regiao}`);
-  return response.json();
+  return handleResponse(response, "buscar técnicos por região");
 }
 
 export async function criarTecnico(tecnico) {
@@ -45,12 +53,12 @@ export async function criarTecnico(tecnico) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(tecnico)
   });
-  return response.json();
+  return handleResponse(response, "criar técnico");
 }
 
 export async function getAgenda(tecnicoId) {
   const response = await fetch(`${API_URL}/agenda/${tecnicoId}`);
-  return response.json();
+  return handleResponse(response, "buscar agenda");
 }
 
 export async function atualizarStatusChamado(id, status) {
@@ -59,17 +67,17 @@ export async function atualizarStatusChamado(id, status) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ status })
   });
-  return response.json();
+  return handleResponse(response, "atualizar status do chamado");
 }
 
 export async function getHistorico(clienteId) {
   const response = await fetch(`${API_URL}/historico/${clienteId}`);
-  return response.json();
+  return handleResponse(response, "buscar histórico");
 }
 
 export async function getAnalistas() {
   const response = await fetch(`${API_URL}/analistas`);
-  return response.json();
+  return handleResponse(response, "buscar analistas");
 }
 
 export async function criarVisita(visita) {
@@ -78,12 +86,12 @@ export async function criarVisita(visita) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(visita),
   });
-  return response.json();
+  return handleResponse(response, "criar visita");
 }
 
 export async function getVisitas() {
   const response = await fetch(`${API_URL}/visitas`);
-  return response.json();
+  return handleResponse(response, "buscar visitas");
 }
 
 export async function atualizarVisita(id, visita) {
@@ -92,22 +100,22 @@ export async function atualizarVisita(id, visita) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(visita)
   });
-  return response.json();
+  return handleResponse(response, "atualizar visita");
 }
 
 export async function excluirVisita(id) {
   const response = await fetch(`${API_URL}/visitas/${id}`, {
     method: "DELETE"
   });
-  return response.json();
+  return handleResponse(response, "excluir visita");
 }
 
 export async function getGeocode(endereco) {
   const response = await fetch(`${API_URL}/geocode?q=${encodeURIComponent(endereco)}`);
-  return response.json();
+  return handleResponse(response, "buscar geocode");
 }
 
 export async function getGeocodeEndereco(enderecoCompleto) {
   const response = await fetch(`${API_URL}/geocode?q=${encodeURIComponent(enderecoCompleto)}`);
-  return response.json();
+  return handleResponse(response, "buscar geocode do endereço completo");
 }
