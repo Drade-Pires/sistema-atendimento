@@ -83,8 +83,10 @@ function Agenda() {
   const visitasFiltradas = visitas.filter(v => {
     let ok = true;
     if (dataFiltro) {
-      const dataVisita = new Date(v.data_agendamento).toISOString().split("T")[0];
-      ok = ok && dataVisita === dataFiltro;
+      const dataVisita = new Date(v.data_agendamento).toLocaleDateString("pt-BR", { timeZone: "UTC" });
+      const filtroFormatado = new Date(dataFiltro).toLocaleDateString("pt-BR", { timeZone: "UTC" });
+      ok = ok && dataVisita === filtroFormatado;
+
     }
     if (regiaoFiltro) {
       ok = ok && v.regiao === regiaoFiltro;
@@ -151,7 +153,7 @@ function Agenda() {
             <tbody>
               {lista.map(v => (
                 <tr key={v.id}>
-                  <td>{new Date(v.data_agendamento).toLocaleDateString("pt-BR")}</td>
+                  <td>{new Date(v.data_agendamento).toLocaleDateString("pt-BR", { timeZone: "UTC" })}</td>
                   <td>{analistas.find(a => a.id === v.analista_id)?.nome || v.analista}</td>
                   <td>{v.zona}</td>
                   <td>{v.empresa}</td>
