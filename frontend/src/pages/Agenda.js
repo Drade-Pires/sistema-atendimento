@@ -7,8 +7,11 @@ function Agenda() {
   const [editVisita, setEditVisita] = useState(null);
   const [tecnicos, setTecnicos] = useState([]);
   const [analistas, setAnalistas] = useState([]);
-  const [dataFiltro, setDataFiltro] = useState("");
-  const [regiaoFiltro, setRegiaoFiltro] = useState(""); // NOVO filtro de região
+
+  // inicia já com a data de hoje e região padrão
+  const hoje = new Date().toISOString().split("T")[0];
+  const [dataFiltro, setDataFiltro] = useState(hoje);
+  const [regiaoFiltro, setRegiaoFiltro] = useState("São Paulo");
 
   useEffect(() => {
     carregarDados();
