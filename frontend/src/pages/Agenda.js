@@ -92,7 +92,15 @@ function Agenda() {
                   <td>{v.endereco}</td>
                   <td>{v.regiao}</td>
                   <td>
-                    <button onClick={() => navigate("/chamados", { state: { ...v } })}>Editar</button>
+                    <button
+                      onClick={() =>
+                        navigate("/chamados", {
+                          state: { ...v } // passa todos os dados da visita para edição
+                        })
+                      }
+                    >
+                      Editar
+                    </button>
                     <button onClick={() => removerVisita(v.id)}>Excluir</button>
                   </td>
                 </tr>
