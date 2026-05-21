@@ -11,9 +11,12 @@ function Chamados() {
   const [tecnicos, setTecnicos] = useState([]);
   const [analistas, setAnalistas] = useState([]);
 
-  // inicializa todos os campos com prefill
+  // garante formato yyyy-MM-dd
   const [dataAgendamento, setDataAgendamento] = useState(
-  prefill.data_agendamento? new Date(prefill.data_agendamento).toISOString().split("T")[0]: "");
+    prefill.data_agendamento
+      ? new Date(prefill.data_agendamento).toISOString().split("T")[0]
+      : ""
+  );
   const [tecnicoId, setTecnicoId] = useState(prefill.tecnico_id || "");
   const [analistaId, setAnalistaId] = useState(prefill.analista_id || "");
   const [regiao, setRegiao] = useState(prefill.regiao || "");
@@ -72,7 +75,10 @@ function Chamados() {
     }
 
     const payload = {
-      data_agendamento: dataAgendamento,
+      // garante formato yyyy-MM-dd no envio também
+      data_agendamento: dataAgendamento
+        ? new Date(dataAgendamento).toISOString().split("T")[0]
+        : "",
       tecnico_id: tecnicoId,
       analista_id: analistaId,
       regiao,
@@ -108,7 +114,11 @@ function Chamados() {
         <div className="form-grid">
           <label>
             Data da visita:
-            <input type="date" value={dataAgendamento} onChange={e => setDataAgendamento(e.target.value)} />
+            <input
+              type="date"
+              value={dataAgendamento}
+              onChange={e => setDataAgendamento(e.target.value)}
+            />
           </label>
 
           <label>
