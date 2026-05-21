@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { getVisitas, criarVisita, atualizarVisita, excluirVisita, getTecnicos, getAnalistas, getGeocodeEndereco } from "../services/api";
+import {
+  getVisitas,
+  criarVisita,
+  atualizarVisita,
+  excluirVisita,
+  getTecnicos,
+  getAnalistas,
+  getGeocodeEndereco
+} from "../services/api";
 import "../styles/Agenda.css";
 
 function Agenda() {
@@ -23,21 +31,31 @@ function Agenda() {
     setTecnicos(await getTecnicos());
     setAnalistas(await getAnalistas());
   }
-
   async function salvarEdicao() {
-    await atualizarVisita(editVisita.id, editVisita);
+    await atualizarVisita(editVisita.id, {
+      ...editVisita,
+      tecnico_id: parseInt(editVisita.tecnico_id),
+      analista_id: parseInt(editVisita.analista_id)
+    });
     setEditVisita(null);
     carregarDados();
   }
 
   async function salvarNovaVisita() {
     try {
-      if (!novaVisita.empresa || !novaVisita.endereco || !novaVisita.numero || !novaVisita.regiao) {
+      if (
+        !novaVisita.empresa ||
+        !novaVisita.endereco ||
+        !novaVisita.numero ||
+        !novaVisita.cidade ||
+        !novaVisita.estado ||
+        !novaVisita.regiao
+      ) {
         alert("Preencha todos os campos obrigatórios antes de salvar");
         return;
       }
 
-      const enderecoCompleto = `${novaVisita.endereco}, ${novaVisita.numero} - ${novaVisita.regiao}, ${novaVisita.cep}`;
+      const enderecoCompleto = `${novaVisita.endereco}, ${novaVisita.numero} - ${novaVisita.cidade}/${novaVisita.estado}, ${novaVisita.cep}`;
 
       let lat = novaVisita.latitude;
       let lon = novaVisita.longitude;
@@ -45,9 +63,14 @@ function Agenda() {
       if (!lat || !lon) {
         try {
           const resultados = await getGeocodeEndereco(enderecoCompleto);
-          if (resultados && resultados.length > 0) {
-            lat = parseFloat(resultados[0].lat);
-            lon = parseFloat(resultados[0].lon);
+          const resultadoValido = resultados.find(
+            r =>
+              r.display_name &&
+              r.display_name.toLowerCase().includes(novaVisita.cidade.toLowerCase())
+          );
+          if (resultadoValido) {
+            lat = parseFloat(resultadoValido.lat);
+            lon = parseFloat(resultadoValido.lon);
           }
         } catch (err) {
           console.error("Erro ao buscar coordenadas:", err);
@@ -55,14 +78,18 @@ function Agenda() {
       }
 
       const visitaFinal = {
-        ...novaVisita,
+        data_agendamento: novaVisita.data_agendamento,
+        tecnico_id: parseInt(novaVisita.tecnico_id),
+        analista_id: parseInt(novaVisita.analista_id),
+        regiao: novaVisita.regiao,
+        zona: novaVisita.zona,
+        empresa: novaVisita.empresa,
+        cep: novaVisita.cep,
         endereco: enderecoCompleto,
         latitude: lat,
         longitude: lon,
         status: "agendado"
       };
-
-      console.log("Payload enviado:", visitaFinal);
 
       const res = await criarVisita(visitaFinal);
       console.log("Resposta da API:", res);
@@ -86,31 +113,26 @@ function Agenda() {
       const dataVisita = new Date(v.data_agendamento).toLocaleDateString("pt-BR", { timeZone: "UTC" });
       const filtroFormatado = new Date(dataFiltro).toLocaleDateString("pt-BR", { timeZone: "UTC" });
       ok = ok && dataVisita === filtroFormatado;
-
     }
     if (regiaoFiltro) {
       ok = ok && v.regiao === regiaoFiltro;
     }
     return ok;
   });
-
   const visitasPorTecnico = visitasFiltradas.reduce((acc, v) => {
     const tecnicoNome = tecnicos.find(t => t.id === v.tecnico_id)?.nome || v.tecnico || "Sem técnico";
     if (!acc[tecnicoNome]) acc[tecnicoNome] = [];
     acc[tecnicoNome].push(v);
     return acc;
   }, {});
+
   return (
     <div className="agenda-container">
       <h2>Visitas Técnicas</h2>
 
       <div className="filtros">
         <label>Filtrar por data: </label>
-        <input
-          type="date"
-          value={dataFiltro}
-          onChange={e => setDataFiltro(e.target.value)}
-        />
+        <input type="date" value={dataFiltro} onChange={e => setDataFiltro(e.target.value)} />
 
         <label>Filtrar por região: </label>
         <select value={regiaoFiltro} onChange={e => setRegiaoFiltro(e.target.value)}>
@@ -127,18 +149,22 @@ function Agenda() {
             {tecnicoNome} — {lista.length} visitas
             <button
               className="agendar-btn"
-              onClick={() => setNovaVisita({
-                tecnico_id: tecnicos.find(t => t.nome === tecnicoNome)?.id,
-                data_agendamento: dataFiltro,
-                regiao: regiaoFiltro || "São Paulo",
-                zona: "",
-                empresa: "",
-                endereco: "",
-                cep: "",
-                numero: "",
-                analista_id: "",
-                status: "agendado"
-              })}
+              onClick={() =>
+                setNovaVisita({
+                  tecnico_id: tecnicos.find(t => t.nome === tecnicoNome)?.id,
+                  data_agendamento: dataFiltro,
+                  regiao: regiaoFiltro || "São Paulo",
+                  zona: "",
+                  empresa: "",
+                  endereco: "",
+                  cep: "",
+                  numero: "",
+                  cidade: "",
+                  estado: "",
+                  analista_id: "",
+                  status: "agendado"
+                })
+              }
             >
               Agendar
             </button>
@@ -169,7 +195,6 @@ function Agenda() {
           </table>
         </div>
       ))}
-
       {editVisita && (
         <div className="modal">
           <div>
@@ -257,7 +282,9 @@ function Agenda() {
                     setNovaVisita({
                       ...novaVisita,
                       cep,
-                      endereco: `${dados.logradouro}, ${dados.bairro}, ${dados.localidade} - ${dados.uf}`
+                      endereco: dados.logradouro,
+                      cidade: dados.localidade,
+                      estado: dados.uf
                     });
                   }
                 }
@@ -271,9 +298,21 @@ function Agenda() {
             />
             <input
               type="text"
-              placeholder="Endereço completo"
+              placeholder="Endereço"
               value={novaVisita.endereco || ""}
               onChange={e => setNovaVisita({ ...novaVisita, endereco: e.target.value })}
+            />
+            <input
+              type="text"
+              placeholder="Cidade"
+              value={novaVisita.cidade || ""}
+              onChange={e => setNovaVisita({ ...novaVisita, cidade: e.target.value })}
+            />
+            <input
+              type="text"
+              placeholder="Estado"
+              value={novaVisita.estado || ""}
+              onChange={e => setNovaVisita({ ...novaVisita, estado: e.target.value })}
             />
             <input
               type="text"
@@ -293,5 +332,3 @@ function Agenda() {
 }
 
 export default Agenda;
-
-//
