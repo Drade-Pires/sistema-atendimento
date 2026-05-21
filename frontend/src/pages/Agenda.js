@@ -100,6 +100,8 @@ function Agenda() {
                 zona: "",
                 empresa: "",
                 endereco: "",
+                cep: "",
+                numero: "",
                 analista_id: "",
                 status: "agendado"
               })}
@@ -220,20 +222,54 @@ function Agenda() {
               <option>Rio de Janeiro</option>
               <option>Curitiba</option>
             </select>
+
+            {/* CEP e número para buscar endereço */}
+            <input
+              type="text"
+              placeholder="CEP"
+              value={novaVisita.cep || ""}
+              onChange={async e => {
+                const cep = e.target.value;
+                setNovaVisita({ ...novaVisita, cep });
+                if (cep.length === 8) {
+                  const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                  const dados = await res.json();
+                  if (!dados.erro) {
+                    setNovaVisita({
+                      ...novaVisita,
+                      cep,
+                      endereco: `${dados.logradouro}, ${dados.bairro}, ${dados.localidade} - ${dados.uf}`
+                    });
+                  }
+                }
+              }}
+            />
+
+            <input
+              type="text"
+              placeholder="Número"
+              value={novaVisita.numero || ""}
+              onChange={e => setNovaVisita({ ...novaVisita, numero: e.target.value })}
+            />
+
+            <input
+              type="text"
+              placeholder="Endereço completo"
+              value={novaVisita.endereco || ""}
+              onChange={e => setNovaVisita({ ...novaVisita, endereco: e.target.value })}
+            />
+
             <input
               type="text"
               placeholder="Empresa"
               value={novaVisita.empresa}
               onChange={e => setNovaVisita({ ...novaVisita, empresa: e.target.value })}
             />
-            <input
-              type="text"
-              placeholder="Endereço"
-              value={novaVisita.endereco}
-              onChange={e => setNovaVisita({ ...novaVisita, endereco: e.target.value })}
-            />
-            <button onClick={salvarNovaVisita}>Salvar</button>
-            <button onClick={() => setNovaVisita(null)}>Cancelar</button>
+
+            <div className="modal-actions">
+              <button onClick={salvarNovaVisita}>Salvar</button>
+              <button onClick={() => setNovaVisita(null)}>Cancelar</button>
+            </div>
           </div>
         </div>
       )}
