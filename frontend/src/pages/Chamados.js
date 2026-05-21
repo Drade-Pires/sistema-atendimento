@@ -38,12 +38,16 @@ function Chamados() {
       getTecnicosPorRegiao(regiao).then(setTecnicos);
     } else {
       setTecnicos([]);
-      setTecnicoId("");
     }
   }, [regiao]);
 
   async function handleSubmit(e) {
     e.preventDefault();
+
+    if (!regiao) {
+      alert("Selecione a região antes de salvar!");
+      return;
+    }
 
     const enderecoCompleto = `${endereco.endereco}, ${endereco.numero} - ${endereco.cidade}/${endereco.estado}, ${endereco.cep}`;
     let lat = endereco.lat;
@@ -52,8 +56,10 @@ function Chamados() {
     if (!lat || !lon) {
       try {
         const resultados = await getGeocodeEndereco(enderecoCompleto);
-        const resultadoValido = resultados.find(r =>
-          r.display_name && r.display_name.toLowerCase().includes(endereco.cidade.toLowerCase())
+        const resultadoValido = resultados.find(
+          r =>
+            r.display_name &&
+            r.display_name.toLowerCase().includes(endereco.cidade.toLowerCase())
         );
         if (resultadoValido) {
           lat = parseFloat(resultadoValido.lat);
@@ -98,8 +104,62 @@ function Chamados() {
         {prefill.id ? "Editar Visita Técnica" : "Agendar Visita Técnica"}
       </h2>
       <form onSubmit={handleSubmit} className="chamados-form">
-        {/* todos os inputs já começam com os valores de prefill */}
-        {/* ... resto do formulário igual ao seu */}
+        <div className="form-grid">
+          <label>
+            Data da visita:
+            <input type="date" value={dataAgendamento} onChange={e => setDataAgendamento(e.target.value)} />
+          </label>
+
+          <label>
+            Região:
+            <select value={regiao} onChange={e => setRegiao(e.target.value)} required>
+              <option value="">Selecione a região</option>
+              <option>São Paulo</option>
+              <option>Rio de Janeiro</option>
+              <option>Curitiba</option>
+            </select>
+          </label>
+
+          <label>
+            Técnico:
+            <select value={tecnicoId} onChange={e => setTecnicoId(e.target.value)} required>
+              <option value="">Selecione o técnico</option>
+              {tecnicos.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
+            </select>
+          </label>
+
+          <label>
+            Analista:
+            <select value={analistaId} onChange={e => setAnalistaId(e.target.value)}>
+              <option value="">Selecione o analista</option>
+              {analistas.map(a => <option key={a.id} value={a.id}>{a.nome}</option>)}
+            </select>
+          </label>
+
+          <label>
+            Zona:
+            <select value={zona} onChange={e => setZona(e.target.value)}>
+              <option value="">Selecione a zona</option>
+              {[...Array(9)].map((_, i) => (
+                <option key={i+1} value={i+1}>{i+1}</option>
+              ))}
+            </select>
+          </label>
+
+          <label>
+            Empresa:
+            <input type="text" value={empresa} onChange={e => setEmpresa(e.target.value)} />
+          </label>
+
+          <label className="endereco-field">
+            Endereço:
+            <EnderecoInput value={endereco} onChange={setEndereco} />
+          </label>
+        </div>
+
+        <button type="submit" className="chamados-button">
+          {prefill.id ? "Salvar Alterações" : "Agendar"}
+        </button>
       </form>
     </div>
   );
