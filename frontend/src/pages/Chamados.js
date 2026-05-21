@@ -12,7 +12,8 @@ function Chamados() {
   const [analistas, setAnalistas] = useState([]);
 
   // inicializa todos os campos com prefill
-  const [dataAgendamento, setDataAgendamento] = useState(prefill.data_agendamento?.split("T")[0] || "");
+  const [dataAgendamento, setDataAgendamento] = useState(
+  prefill.data_agendamento? new Date(prefill.data_agendamento).toISOString().split("T")[0]: "");
   const [tecnicoId, setTecnicoId] = useState(prefill.tecnico_id || "");
   const [analistaId, setAnalistaId] = useState(prefill.analista_id || "");
   const [regiao, setRegiao] = useState(prefill.regiao || "");
