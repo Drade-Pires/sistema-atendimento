@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { getTecnicosPorRegiao, getAnalistas, criarVisita, getGeocodeEndereco } from "../services/api";
 import EnderecoInput from "../components/EnderecoInput";
 import "../styles/Chamados.css";
 
 function Chamados() {
+  const location = useLocation();
+  const prefill = location.state || {};
+
   const [tecnicos, setTecnicos] = useState([]);
   const [analistas, setAnalistas] = useState([]);
-  const [dataAgendamento, setDataAgendamento] = useState("");
-  const [tecnicoId, setTecnicoId] = useState("");
+  const [dataAgendamento, setDataAgendamento] = useState(prefill.data_agendamento || "");
+  const [tecnicoId, setTecnicoId] = useState(prefill.tecnico_id || "");
   const [analistaId, setAnalistaId] = useState("");
-  const [regiao, setRegiao] = useState(""); // campo obrigatório
+  const [regiao, setRegiao] = useState(prefill.regiao || "");
   const [zona, setZona] = useState("");
   const [empresa, setEmpresa] = useState("");
   const [endereco, setEndereco] = useState({
@@ -31,11 +35,13 @@ function Chamados() {
   useEffect(() => {
     if (regiao) {
       getTecnicosPorRegiao(regiao).then(setTecnicos);
-      setTecnicoId(""); // limpa seleção anterior
+      // se veio da Agenda já com técnico, mantém
+      if (!prefill.tecnico_id) setTecnicoId("");
     } else {
       setTecnicos([]);
+      setTecnicoId("");
     }
-  }, [regiao]);
+  }, [regiao, prefill.tecnico_id]);
 
   async function handleSubmit(e) {
     e.preventDefault();
