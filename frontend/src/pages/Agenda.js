@@ -42,6 +42,8 @@ function Agenda() {
       status: "agendado"
     };
 
+     console.log("Payload enviado:", JSON.stringify(visitaFinal, null, 2));
+
     if (isEdit) await atualizarVisita(visita.id, payload);
     else await criarVisita(payload);
 
