@@ -8,6 +8,7 @@ router.post("/", async (req, res) => {
     data_agendamento,
     tecnico_id,
     analista_id,
+    regiao,   // NOVO campo
     zona,
     empresa,
     endereco,
@@ -16,23 +17,22 @@ router.post("/", async (req, res) => {
     status
   } = req.body;
 
-  if (!data_agendamento || !tecnico_id || !analista_id || !empresa || !endereco) {
+  if (!data_agendamento || !tecnico_id || !analista_id || !empresa || !endereco || !regiao) {
     return res.status(400).json({
-      error: "Campos obrigatórios: data_agendamento, tecnico_id, analista_id, empresa, endereco."
+      error: "Campos obrigatórios: data_agendamento, tecnico_id, analista_id, empresa, endereco, regiao."
     });
   }
 
   try {
     const result = await pool.query(
       `INSERT INTO visitas 
-       (data_agendamento, tecnico_id, analista_id, zona, empresa, endereco, latitude, longitude, status) 
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`,
-      [data_agendamento, tecnico_id, analista_id, zona, empresa, endereco, latitude, longitude, status]
+       (data_agendamento, tecnico_id, analista_id, regiao, zona, empresa, endereco, latitude, longitude, status) 
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *`,
+      [data_agendamento, tecnico_id, analista_id, regiao, zona, empresa, endereco, latitude, longitude, status]
     );
 
     const visita = result.rows[0];
 
-    // Buscar nomes relacionados
     const joinResult = await pool.query(`
       SELECT v.*, t.nome AS tecnico, a.nome AS analista
       FROM visitas v
@@ -71,6 +71,7 @@ router.put("/:id", async (req, res) => {
     data_agendamento,
     tecnico_id,
     analista_id,
+    regiao,   // NOVO campo
     zona,
     empresa,
     endereco,
@@ -80,9 +81,9 @@ router.put("/:id", async (req, res) => {
   try {
     await pool.query(
       `UPDATE visitas 
-       SET data_agendamento=$1, tecnico_id=$2, analista_id=$3, zona=$4, empresa=$5, endereco=$6, status=$7
-       WHERE id=$8`,
-      [data_agendamento, tecnico_id, analista_id, zona, empresa, endereco, status, req.params.id]
+       SET data_agendamento=$1, tecnico_id=$2, analista_id=$3, regiao=$4, zona=$5, empresa=$6, endereco=$7, status=$8
+       WHERE id=$9`,
+      [data_agendamento, tecnico_id, analista_id, regiao, zona, empresa, endereco, status, req.params.id]
     );
 
     const result = await pool.query(`
