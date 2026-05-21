@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getVisitas, criarVisita, atualizarVisita, excluirVisita, getTecnicos, getAnalistas } from "../services/api";
+import { getVisitas, criarVisita, atualizarVisita, excluirVisita, getTecnicos, getAnalistas, getGeocodeEndereco } from "../services/api";
 import "../styles/Agenda.css";
 
 function Agenda() {
@@ -9,7 +9,6 @@ function Agenda() {
   const [tecnicos, setTecnicos] = useState([]);
   const [analistas, setAnalistas] = useState([]);
 
-  // inicia já com a data de hoje e região padrão
   const hoje = new Date().toISOString().split("T")[0];
   const [dataFiltro, setDataFiltro] = useState(hoje);
   const [regiaoFiltro, setRegiaoFiltro] = useState("São Paulo");
@@ -32,9 +31,48 @@ function Agenda() {
   }
 
   async function salvarNovaVisita() {
-    await criarVisita(novaVisita);
-    setNovaVisita(null);
-    carregarDados();
+    try {
+      if (!novaVisita.empresa || !novaVisita.endereco || !novaVisita.numero || !novaVisita.regiao) {
+        alert("Preencha todos os campos obrigatórios antes de salvar");
+        return;
+      }
+
+      const enderecoCompleto = `${novaVisita.endereco}, ${novaVisita.numero} - ${novaVisita.regiao}, ${novaVisita.cep}`;
+
+      let lat = novaVisita.latitude;
+      let lon = novaVisita.longitude;
+
+      if (!lat || !lon) {
+        try {
+          const resultados = await getGeocodeEndereco(enderecoCompleto);
+          if (resultados && resultados.length > 0) {
+            lat = parseFloat(resultados[0].lat);
+            lon = parseFloat(resultados[0].lon);
+          }
+        } catch (err) {
+          console.error("Erro ao buscar coordenadas:", err);
+        }
+      }
+
+      const visitaFinal = {
+        ...novaVisita,
+        endereco: enderecoCompleto,
+        latitude: lat,
+        longitude: lon,
+        status: "agendado"
+      };
+
+      console.log("Payload enviado:", visitaFinal);
+
+      const res = await criarVisita(visitaFinal);
+      console.log("Resposta da API:", res);
+
+      setNovaVisita(null);
+      carregarDados();
+    } catch (err) {
+      console.error("Erro ao salvar visita:", err);
+      alert("Erro ao salvar visita. Veja o console para detalhes.");
+    }
   }
 
   async function removerVisita(id) {
@@ -42,30 +80,24 @@ function Agenda() {
     carregarDados();
   }
 
-  // aplica filtro de data e região
   const visitasFiltradas = visitas.filter(v => {
     let ok = true;
-
     if (dataFiltro) {
       const dataVisita = new Date(v.data_agendamento).toISOString().split("T")[0];
       ok = ok && dataVisita === dataFiltro;
     }
-
     if (regiaoFiltro) {
       ok = ok && v.regiao === regiaoFiltro;
     }
-
     return ok;
   });
 
-  // agrupa por técnico
   const visitasPorTecnico = visitasFiltradas.reduce((acc, v) => {
     const tecnicoNome = tecnicos.find(t => t.id === v.tecnico_id)?.nome || v.tecnico || "Sem técnico";
     if (!acc[tecnicoNome]) acc[tecnicoNome] = [];
     acc[tecnicoNome].push(v);
     return acc;
   }, {});
-
   return (
     <div className="agenda-container">
       <h2>Visitas Técnicas</h2>
@@ -135,6 +167,7 @@ function Agenda() {
           </table>
         </div>
       ))}
+
       {editVisita && (
         <div className="modal">
           <div>
@@ -155,20 +188,6 @@ function Agenda() {
               onChange={e => setEditVisita({ ...editVisita, analista_id: parseInt(e.target.value) })}
             >
               {analistas.map(a => <option key={a.id} value={a.id}>{a.nome}</option>)}
-            </select>
-            <select
-              value={editVisita.zona}
-              onChange={e => setEditVisita({ ...editVisita, zona: e.target.value })}
-            >
-              {[...Array(9)].map((_, i) => <option key={i+1} value={i+1}>{i+1}</option>)}
-            </select>
-            <select
-              value={editVisita.regiao}
-              onChange={e => setEditVisita({ ...editVisita, regiao: e.target.value })}
-            >
-              <option>São Paulo</option>
-              <option>Rio de Janeiro</option>
-              <option>Curitiba</option>
             </select>
             <input
               type="text"
@@ -222,8 +241,6 @@ function Agenda() {
               <option>Rio de Janeiro</option>
               <option>Curitiba</option>
             </select>
-
-            {/* CEP e número para buscar endereço */}
             <input
               type="text"
               placeholder="CEP"
@@ -244,28 +261,24 @@ function Agenda() {
                 }
               }}
             />
-
             <input
               type="text"
               placeholder="Número"
               value={novaVisita.numero || ""}
               onChange={e => setNovaVisita({ ...novaVisita, numero: e.target.value })}
             />
-
             <input
               type="text"
               placeholder="Endereço completo"
               value={novaVisita.endereco || ""}
               onChange={e => setNovaVisita({ ...novaVisita, endereco: e.target.value })}
             />
-
             <input
               type="text"
               placeholder="Empresa"
               value={novaVisita.empresa}
               onChange={e => setNovaVisita({ ...novaVisita, empresa: e.target.value })}
             />
-
             <div className="modal-actions">
               <button onClick={salvarNovaVisita}>Salvar</button>
               <button onClick={() => setNovaVisita(null)}>Cancelar</button>
