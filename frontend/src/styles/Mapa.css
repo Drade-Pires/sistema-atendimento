@@ -1,0 +1,72 @@
+.mapa-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+/* título */
+.mapa-title {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: 600;
+  color: #b30000; /* vermelho principal */
+}
+
+/* controles acima do mapa */
+.mapa-controls {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.mapa-controls label {
+  font-size: 13px;
+  color: #444;
+}
+
+.mapa-controls input,
+.mapa-controls select {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 13px;
+  background-color: #f9f9f9;
+  transition: border-color 0.2s ease;
+}
+
+.mapa-controls input:focus,
+.mapa-controls select:focus {
+  border-color: #b30000;
+  outline: none;
+}
+
+/* área do mapa */
+.mapa-view {
+  width: 100%;
+  height: 500px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08); /* leve sombra */
+  margin-bottom: 20px;
+}
+
+/* botões */
+.mapa-button {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: #b30000;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.mapa-button:hover {
+  background-color: #800000;
+}

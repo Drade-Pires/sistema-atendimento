@@ -4,6 +4,7 @@ import L from "leaflet";
 import { getVisitas, getGeocodeEndereco } from "../services/api";
 import { formatarEndereco } from "../utils/formatarEndereco";
 import { tecnicosPorRegiao } from "../utils/tecnicosPorRegiao";
+import "../styles/Agenda.css";
 import "leaflet/dist/leaflet.css";
 
 // Ícone padrão (fallback)
