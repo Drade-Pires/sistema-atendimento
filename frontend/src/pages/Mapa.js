@@ -66,6 +66,7 @@ function Mapa() {
   useEffect(() => {
     async function carregarVisitas() {
       const dados = await getVisitas();
+      console.log("Visitas carregadas:", dados);
       setVisitas(dados);
     }
     carregarVisitas();

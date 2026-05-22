@@ -74,11 +74,8 @@ function Chamados() {
       }
     }
 
-    const payload = {
-      // garante formato yyyy-MM-dd no envio também
-      data_agendamento: dataAgendamento
-        ? new Date(dataAgendamento).toISOString().split("T")[0]
-        : "",
+        const payload = {
+      data_agendamento: dataAgendamento || "",
       tecnico_id: tecnicoId,
       analista_id: analistaId,
       regiao,
@@ -86,12 +83,15 @@ function Chamados() {
       empresa,
       cep: endereco.cep,
       endereco: enderecoCompleto,
-      latitude: lat,
-      longitude: lon,
+      latitude: lat ?? 0,
+      longitude: lon ?? 0,
       status: "agendado"
+      
     };
 
+
     try {
+       console.log("Payload enviado:", payload);
       if (prefill.id) {
         await atualizarVisita(prefill.id, payload);
         alert("Visita atualizada com sucesso!");
