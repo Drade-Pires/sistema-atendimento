@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { getTecnicosPorRegiao, getAnalistas, criarVisita, atualizarVisita, getGeocodeEndereco } from "../services/api";
 import EnderecoInput from "../components/EnderecoInput";
-import VisitaPreview from "../components/VisitaPreview";
+import VisitaCompact from "../components/VisitaCompact";
 import "../styles/Chamados.css";
 
 function Chamados() {
