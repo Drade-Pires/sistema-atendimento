@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { formatarEndereco } from "./utils";
+import { formatarEndereco } from "../utils/formatarEndereco";
 import "../styles/VisitaCompact.css";
 
 function VisitaCompact({ zona, endereco }) {
