@@ -52,7 +52,8 @@ function ChangeView({ center }) {
 function Mapa() {
   const [center, setCenter] = useState([-23.5505, -46.6333]); // São Paulo inicial
   const [visitas, setVisitas] = useState([]);
-  const [dataFiltro, setDataFiltro] = useState("");
+  const hoje = new Date().toISOString().split("T")[0];
+  const [dataFiltro, setDataFiltro] = useState(hoje);
   const [enderecoBusca, setEnderecoBusca] = useState("");
   const [tecnicoProximo, setTecnicoProximo] = useState(null);
 
