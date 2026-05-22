@@ -35,6 +35,11 @@ function App() {
             <Route path="/mapa" element={<Mapa />} />
           </Routes>
         </main>
+        
+       {/* Rodapé */}
+        <footer style={{ textAlign: "center", padding: "10px", fontSize: "14px", color: "#555" }}>
+          © {new Date().getFullYear()} Desenvolvido por Jhonatan Pires
+        </footer>
       </div>
     </Router>
   );
