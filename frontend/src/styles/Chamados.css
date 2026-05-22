@@ -1,50 +1,75 @@
 .chamados-container {
-  max-width: 1000px;
+  max-width: 1200px; /* igual Agenda */
   margin: 0 auto;
   padding: 20px;
 }
 
+/* título principal */
 .chamados-title {
   text-align: center;
-  margin-bottom: 20px;
-  color: var(--color-primary);
+  margin-bottom: 18px;
+  font-size: 20px;
+  color: #b30000; /* vermelho principal */
 }
 
+/* formulário */
 .chamados-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
 }
 
+/* grid de campos */
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr; /* duas colunas */
-  gap: 20px;
+  gap: 16px;
 }
 
 .form-grid label {
   display: flex;
   flex-direction: column;
-  font-weight: bold;
-  color: var(--color-text);
+  font-size: 13px;
+  color: #444;
 }
 
+/* inputs e selects */
+.form-grid input,
+.form-grid select,
+.form-grid textarea {
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  font-size: 13px;
+  background-color: #f9f9f9;
+}
+
+.form-grid input:focus,
+.form-grid select:focus,
+.form-grid textarea:focus {
+  border-color: #b30000;
+  outline: none;
+}
+
+/* campo de endereço ocupa largura total */
 .endereco-field {
-  grid-column: span 2; /* endereço ocupa largura total */
+  grid-column: span 2;
 }
 
+/* botão */
 .chamados-button {
   align-self: center;
-  padding: 12px 24px;
-  background-color: var(--color-primary);
+  padding: 8px 14px;
+  background-color: #b30000; /* vermelho */
   color: #fff;
   border: none;
-  border-radius: 6px;
+  border-radius: 3px;
+  font-size: 13px;
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
 
 .chamados-button:hover {
-  background-color: #b71c1c;
+  background-color: #800000; /* vermelho escuro */
 }

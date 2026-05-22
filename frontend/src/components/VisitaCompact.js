@@ -23,9 +23,11 @@ OBSERVAÇÃO: ${observacao || "—"}
   };
 
   return (
-    <div className="visita-compact">
-      <h3>Modelo de Visita Técnica</h3>
+  <div className="visita-compact">
+    <h3>Modelo de Visita Técnica</h3>
 
+    {/* NS, Contato e Responsável na mesma linha */}
+    <div className="linha-campos">
       <label>NS:
         <input value={ns} onChange={e => setNs(e.target.value)} />
       </label>
@@ -37,16 +39,19 @@ OBSERVAÇÃO: ${observacao || "—"}
       <label>Responsável:
         <input value={responsavel} onChange={e => setResponsavel(e.target.value)} />
       </label>
-
-      <label>Observação:
-        <textarea value={observacao} onChange={e => setObservacao(e.target.value)} />
-      </label>
-
-      <pre>{texto}</pre>
-
-      <button onClick={copiar}>Copiar Registro</button>
     </div>
-  );
+
+    {/* Observação ocupa toda a largura */}
+    <label className="observacao">Observação:
+      <textarea value={observacao} onChange={e => setObservacao(e.target.value)} />
+    </label>
+
+    <pre>{texto}</pre>
+
+    <button onClick={copiar}>Copiar Registro</button>
+  </div>
+);
+
 }
 
 export default VisitaCompact;
