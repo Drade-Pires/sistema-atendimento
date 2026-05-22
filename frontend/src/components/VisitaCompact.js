@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "../styles//VisitaCompact.css";
 
 function VisitaCompact({ zona, endereco }) {
   const [ns, setNs] = useState("");
@@ -22,21 +23,28 @@ OBSERVAÇÃO: ${observacao || "—"}
   };
 
   return (
-    <div style={{ borderTop: "1px solid #ccc", marginTop: "20px", paddingTop: "10px" }}>
+    <div className="visita-compact">
       <h3>Modelo de Visita Técnica</h3>
 
-      <div style={{ display: "grid", gap: "8px" }}>
-        <label>NS: <input value={ns} onChange={e => setNs(e.target.value)} /></label>
-        <label>Contato: <input value={contato} onChange={e => setContato(e.target.value)} /></label>
-        <label>Responsável: <input value={responsavel} onChange={e => setResponsavel(e.target.value)} /></label>
-        <label>Observação: <textarea value={observacao} onChange={e => setObservacao(e.target.value)} /></label>
-      </div>
+      <label>NS:
+        <input value={ns} onChange={e => setNs(e.target.value)} />
+      </label>
 
-      <pre style={{ whiteSpace: "pre-wrap", fontFamily: "inherit", marginTop: "10px" }}>
-        {texto}
-      </pre>
+      <label>Contato:
+        <input value={contato} onChange={e => setContato(e.target.value)} />
+      </label>
 
-      <button onClick={copiar} style={{ marginTop: "10px" }}>Copiar Registro</button>
+      <label>Responsável:
+        <input value={responsavel} onChange={e => setResponsavel(e.target.value)} />
+      </label>
+
+      <label>Observação:
+        <textarea value={observacao} onChange={e => setObservacao(e.target.value)} />
+      </label>
+
+      <pre>{texto}</pre>
+
+      <button onClick={copiar}>Copiar Registro</button>
     </div>
   );
 }
