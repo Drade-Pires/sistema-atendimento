@@ -57,22 +57,24 @@ function Chamados() {
     let lat = endereco.lat;
     let lon = endereco.lon;
 
-    if (!lat || !lon) {
-      try {
-        const resultados = await getGeocodeEndereco(enderecoCompleto);
-        const resultadoValido = resultados.find(
-          r =>
-            r.display_name &&
-            r.display_name.toLowerCase().includes(endereco.cidade.toLowerCase())
-        );
-        if (resultadoValido) {
-          lat = parseFloat(resultadoValido.lat);
-          lon = parseFloat(resultadoValido.lon);
+      // se não há coordenadas OU o endereço foi alterado, recalcula
+      if (!lat || !lon || enderecoCompleto !== prefill.endereco) {
+        try {
+          const resultados = await getGeocodeEndereco(enderecoCompleto);
+          const resultadoValido = resultados.find(
+            r =>
+              r.display_name &&
+              r.display_name.toLowerCase().includes(endereco.cidade.toLowerCase())
+          );
+          if (resultadoValido) {
+            lat = parseFloat(resultadoValido.lat);
+            lon = parseFloat(resultadoValido.lon);
+          }
+        } catch (err) {
+          console.error("Erro ao buscar coordenadas:", err);
         }
-      } catch (err) {
-        console.error("Erro ao buscar coordenadas:", err);
       }
-    }
+
 
         const payload = {
       data_agendamento: dataAgendamento || "",
