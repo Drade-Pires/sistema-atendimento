@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { getTecnicosPorRegiao, getAnalistas, criarVisita, atualizarVisita, getGeocodeEndereco } from "../services/api";
 import EnderecoInput from "../components/EnderecoInput";
+import VisitaPreview from "../components/VisitaPreview";
 import "../styles/Chamados.css";
 
 function Chamados() {
@@ -184,6 +185,19 @@ function Chamados() {
           {prefill.id ? "Salvar Alterações" : "Agendar"}
         </button>
       </form>
+
+       <VisitaPreview
+      chamado={{
+        zona,
+        ns: prefill.ns,
+        endereco,
+        periodo: "Comercial",
+        contato: prefill.contato,
+        responsavel: prefill.responsavel,
+        observacao: prefill.observacao
+      }}
+    />
+
     </div>
   );
 }
