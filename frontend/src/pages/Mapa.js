@@ -133,10 +133,10 @@ function Mapa() {
                   width: "16px",
                   height: "16px",
                   backgroundColor:
-                    icon.options.iconUrl.includes("red") ? "red" :
-                    icon.options.iconUrl.includes("blue") ? "blue" :
-                    icon.options.iconUrl.includes("green") ? "green" :
-                    icon.options.iconUrl.includes("orange") ? "orange" : "gray",
+                    icon?.options?.iconUrl?.includes("red") ? "red" :
+                    icon?.options?.iconUrl?.includes("blue") ? "blue" :
+                    icon?.options?.iconUrl?.includes("green") ? "green" :
+                    icon?.options?.iconUrl?.includes("orange") ? "orange" : "gray",
                   display: "inline-block",
                   marginRight: "8px"
                 }}
