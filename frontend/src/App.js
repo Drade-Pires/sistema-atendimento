@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, NavLink } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, NavLink, Navigate } from "react-router-dom";
 import Chamados from "./pages/Chamados";
 import Agenda from "./pages/Agenda";
 import Mapa from "./pages/Mapa";
@@ -28,6 +28,8 @@ function App() {
         {/* Conteúdo principal */}
         <main className="content">
           <Routes>
+            {/* redireciona / para /mapa */}
+            <Route path="/" element={<Navigate to="/mapa" />} />
             <Route path="/chamados" element={<Chamados />} />
             <Route path="/agenda" element={<Agenda />} />
             <Route path="/mapa" element={<Mapa />} />
