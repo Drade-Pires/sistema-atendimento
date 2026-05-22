@@ -6,6 +6,16 @@ import { formatarEndereco } from "../utils/formatarEndereco";
 import { tecnicosPorRegiao } from "../utils/tecnicosPorRegiao";
 import "leaflet/dist/leaflet.css";
 
+// Ícone padrão (fallback)
+const defaultIcon = L.icon({
+  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png",
+  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
 // componente auxiliar para mudar a visão do mapa
 function ChangeView({ center }) {
   const map = useMap();
@@ -15,15 +25,17 @@ function ChangeView({ center }) {
 
 function Mapa() {
   const [center, setCenter] = useState([-23.5505, -46.6333]); // São Paulo inicial
-  const [regiao, setRegiao] = useState("São Paulo");          // região inicial
   const [visitas, setVisitas] = useState([]);
   const hoje = new Date().toISOString().split("T")[0];
   const [dataFiltro, setDataFiltro] = useState(hoje);
   const [enderecoBusca, setEnderecoBusca] = useState("");
   const [tecnicoProximo, setTecnicoProximo] = useState(null);
 
-  // pega os técnicos da região atual
-  const iconesTecnicos = tecnicosPorRegiao[regiao] || {};
+  const iconesTecnicos = tecnicosPorRegiao[
+    center[0] === -23.5505 ? "São Paulo" :
+    center[0] === -22.9068 ? "Rio de Janeiro" :
+    center[0] === -25.4284 ? "Curitiba" : ""
+  ] || {};
 
   useEffect(() => {
     async function carregarVisitas() {
@@ -83,16 +95,6 @@ function Mapa() {
     }
   }
 
-  // ícone padrão caso técnico não esteja listado
-  const defaultIcon = L.icon({
-    iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png",
-    shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
-  });
-
   return (
     <div style={{ display: "flex", height: "70vh", width: "100%" }}>
       <div style={{ flex: 3 }}>
@@ -124,10 +126,17 @@ function Mapa() {
       </div>
 
       <div style={{ flex: 1, padding: "15px" }}>
-        <h3>Legenda de Técnicos ({regiao})</h3>
+        <h3>Legenda de Técnicos</h3>
         <ul style={{ listStyle: "none", padding: 0 }}>
           {Object.entries(iconesTecnicos).map(([nome, icon]) => (
-            <li key={nome} style={{ marginBottom: "8px", display: "flex", alignItems: "center" }}>
+            <li
+              key={nome}
+              style={{
+                marginBottom: "8px",
+                display: "flex",
+                alignItems: "center"
+              }}
+            >
               <span
                 style={{
                   width: "16px",
@@ -147,9 +156,9 @@ function Mapa() {
         </ul>
 
         <h3>Selecionar cidade</h3>
-        <button onClick={() => { setCenter([-23.5505, -46.6333]); setRegiao("São Paulo"); }}>São Paulo</button>
-        <button onClick={() => { setCenter([-25.4284, -49.2733]); setRegiao("Curitiba"); }}>Curitiba</button>
-        <button onClick={() => { setCenter([-22.9068, -43.1729]); setRegiao("Rio de Janeiro"); }}>Rio de Janeiro</button>
+        <button onClick={() => setCenter([-23.5505, -46.6333])}>São Paulo</button>
+        <button onClick={() => setCenter([-25.4284, -49.2733])}>Curitiba</button>
+        <button onClick={() => setCenter([-22.9068, -43.1729])}>Rio de Janeiro</button>
 
         <h3>Filtrar por data</h3>
         <input
