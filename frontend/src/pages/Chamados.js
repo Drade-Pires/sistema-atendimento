@@ -186,17 +186,7 @@ function Chamados() {
         </button>
       </form>
 
-       <VisitaPreview
-      chamado={{
-        zona,
-        ns: prefill.ns,
-        endereco,
-        periodo: "Comercial",
-        contato: prefill.contato,
-        responsavel: prefill.responsavel,
-        observacao: prefill.observacao
-      }}
-    />
+       <VisitaPreview zona={zona} endereco={endereco} />
 
     </div>
   );
