@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import L from "leaflet";
 import { getVisitas, getGeocodeEndereco } from "../services/api";
 import { formatarEndereco } from "../utils/formatarEndereco";
 import { tecnicosPorRegiao } from "../utils/tecnicosPorRegiao";
@@ -27,7 +28,7 @@ function Mapa() {
   useEffect(() => {
     async function carregarVisitas() {
       const dados = await getVisitas();
-      setVisitas(dados);
+      setVisitas(Array.isArray(dados) ? dados : []); // garante array
     }
     carregarVisitas();
   }, []);
@@ -82,6 +83,16 @@ function Mapa() {
     }
   }
 
+  // ícone padrão caso técnico não esteja listado
+  const defaultIcon = L.icon({
+    iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png",
+    shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  });
+
   return (
     <div style={{ display: "flex", height: "70vh", width: "100%" }}>
       <div style={{ flex: 3 }}>
@@ -97,7 +108,7 @@ function Mapa() {
               <Marker
                 key={i}
                 position={[v.latitude, v.longitude]}
-                icon={iconesTecnicos[v.tecnico]}
+                icon={iconesTecnicos[v.tecnico] || defaultIcon}
               >
                 <Popup>
                   <strong>{v.empresa}</strong><br />
