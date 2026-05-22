@@ -11,7 +11,7 @@ function VisitaCompact({ zona, endereco }) {
   const texto = `
 Nº DA ZONA: ${zona || "—"}
 NS: ${ns || "—"}
-ENDEREÇO: ${formatarEndereco(chamado) || "—"}
+ENDEREÇO: ${formatarEndereco(endereco) || "—"}
 PERÍODO: Comercial
 CONTATO: ${contato || "—"}
 Nome do responsável: ${responsavel || "—"}
