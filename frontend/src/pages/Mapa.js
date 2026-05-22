@@ -108,7 +108,7 @@ function Mapa() {
       let tecnicoMaisProximo = null;
       let menorDistancia = Infinity;
 
-      visitas.forEach(v => {
+      visitasFiltradas.forEach(v => {
         if (v.latitude && v.longitude) {
           const dist = calcularDistancia(latAlvo, lonAlvo, v.latitude, v.longitude);
           if (dist < menorDistancia) {
