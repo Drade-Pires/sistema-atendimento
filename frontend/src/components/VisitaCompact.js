@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../styles//VisitaCompact.css";
+import "../styles/VisitaCompact.css";
 
 function VisitaCompact({ zona, endereco }) {
   const [ns, setNs] = useState("");
