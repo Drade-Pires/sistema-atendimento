@@ -1,18 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
-function VisitaPreview({ zona, endereco }) {
+function VisitaCompact({ zona, endereco }) {
   const [ns, setNs] = useState("");
   const [contato, setContato] = useState("");
   const [responsavel, setResponsavel] = useState("");
   const [observacao, setObservacao] = useState("");
-
-  // sempre que zona ou endereço mudarem no formulário, atualiza aqui
-  useEffect(() => {
-    setNs("");
-    setContato("");
-    setResponsavel("");
-    setObservacao("");
-  }, [zona, endereco]);
 
   const texto = `
 Nº DA ZONA: ${zona || "—"}
@@ -26,43 +18,27 @@ OBSERVAÇÃO: ${observacao || "—"}
 
   const copiar = () => {
     navigator.clipboard.writeText(texto);
-    alert("Modelo copiado para área de transferência!");
+    alert("Registro copiado!");
   };
 
   return (
-    <div style={{ border: "1px solid #ccc", padding: "10px", marginTop: "20px" }}>
-      <h3>Pré-visualização da Visita</h3>
+    <div style={{ borderTop: "1px solid #ccc", marginTop: "20px", paddingTop: "10px" }}>
+      <h3>Modelo de Visita Técnica</h3>
 
-      <label>
-        NS:
-        <input type="text" value={ns} onChange={e => setNs(e.target.value)} />
-      </label>
-      <br />
-
-      <label>
-        Contato:
-        <input type="text" value={contato} onChange={e => setContato(e.target.value)} />
-      </label>
-      <br />
-
-      <label>
-        Responsável:
-        <input type="text" value={responsavel} onChange={e => setResponsavel(e.target.value)} />
-      </label>
-      <br />
-
-      <label>
-        Observação:
-        <textarea value={observacao} onChange={e => setObservacao(e.target.value)} />
-      </label>
+      <div style={{ display: "grid", gap: "8px" }}>
+        <label>NS: <input value={ns} onChange={e => setNs(e.target.value)} /></label>
+        <label>Contato: <input value={contato} onChange={e => setContato(e.target.value)} /></label>
+        <label>Responsável: <input value={responsavel} onChange={e => setResponsavel(e.target.value)} /></label>
+        <label>Observação: <textarea value={observacao} onChange={e => setObservacao(e.target.value)} /></label>
+      </div>
 
       <pre style={{ whiteSpace: "pre-wrap", fontFamily: "inherit", marginTop: "10px" }}>
         {texto}
       </pre>
 
-      <button onClick={copiar} style={{ marginTop: "10px" }}>Copiar</button>
+      <button onClick={copiar} style={{ marginTop: "10px" }}>Copiar Registro</button>
     </div>
   );
 }
 
-export default VisitaPreview;
+export default VisitaCompact;

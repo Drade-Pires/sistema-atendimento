@@ -186,7 +186,7 @@ function Chamados() {
         </button>
       </form>
 
-       <VisitaPreview zona={zona} endereco={endereco} />
+       <VisitaCompact zona={zona} endereco={endereco} />
 
     </div>
   );
