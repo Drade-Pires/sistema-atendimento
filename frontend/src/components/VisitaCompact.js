@@ -24,7 +24,7 @@ OBSERVAÇÃO: ${observacao || "—"}
 
   return (
   <div className="visita-compact">
-    <h3>Modelo de Visita Técnica</h3>
+    <h3>Modelo para o UNO</h3>
 
     {/* NS, Contato e Responsável na mesma linha */}
     <div className="linha-campos">
