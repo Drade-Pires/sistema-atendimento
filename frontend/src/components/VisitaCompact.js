@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { formatarEndereco } from "./utils";
 import "../styles/VisitaCompact.css";
 
 function VisitaCompact({ zona, endereco }) {
@@ -10,7 +11,7 @@ function VisitaCompact({ zona, endereco }) {
   const texto = `
 Nº DA ZONA: ${zona || "—"}
 NS: ${ns || "—"}
-ENDEREÇO: ${endereco || "—"}
+ENDEREÇO: ${formatarEndereco(chamado) || "—"}
 PERÍODO: Comercial
 CONTATO: ${contato || "—"}
 Nome do responsável: ${responsavel || "—"}
